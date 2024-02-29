@@ -6,7 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
 from sklearn.inspection import permutation_importance
 from scipy.sparse import issparse
-from scipy.stats import binom_test, ks_2samp
+from scipy.stats import binomtest, ks_2samp
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
 import random
@@ -829,7 +829,7 @@ class BorutaShap:
             if self.classification:
                 # for some reason shap returns values wraped in a list of length 1
 
-                self.shap_values = np.array(explainer.shap_values(self.find_sample()))
+                self.shap_values = np.array(explainer.shap_values(self.find_sample(), approximate = True))
                 if isinstance(self.shap_values, list):
 
                     class_inds = range(len(self.shap_values))
@@ -846,14 +846,14 @@ class BorutaShap:
                     self.shap_values = np.abs(self.shap_values).mean(0)
 
             else:
-                self.shap_values = explainer.shap_values(self.find_sample())
+                self.shap_values = explainer.shap_values(self.find_sample(), approximate = True)
                 self.shap_values = np.abs(self.shap_values).mean(0)
 
         else:
 
             if self.classification:
                 # for some reason shap returns values wraped in a list of length 1
-                self.shap_values = np.array(explainer.shap_values(self.X_boruta))
+                self.shap_values = np.array(explainer.shap_values(self.X_boruta, approximate = True))
                 if isinstance(self.shap_values, list):
 
                     class_inds = range(len(self.shap_values))
@@ -870,7 +870,7 @@ class BorutaShap:
                     self.shap_values = np.abs(self.shap_values).mean(0)
 
             else:
-                self.shap_values = explainer.shap_values(self.X_boruta)
+                self.shap_values = explainer.shap_values(self.X_boruta, approximate = True)
                 self.shap_values = np.abs(self.shap_values).mean(0)
 
 
@@ -882,7 +882,7 @@ class BorutaShap:
         This is an exact, two-sided test of the null hypothesis
         that the probability of success in a Bernoulli experiment is p
         """
-        return [binom_test(x, n=n, p=p, alternative=alternative) for x in array]
+        return [binomtest(int(x), n=n, p=p, alternative=alternative).pvalue for x in array]
 
 
     @staticmethod

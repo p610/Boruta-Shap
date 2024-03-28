@@ -830,6 +830,7 @@ class BorutaShap:
                 # for some reason shap returns values wraped in a list of length 1
 
                 self.shap_values = np.array(explainer.shap_values(self.find_sample(), approximate = True))
+                self.shap_values = self.shap_values.reshape(self.shap_values.shape[0], self.shap_values.shape[2], self.shap_values.shape[1])
                 if isinstance(self.shap_values, list):
 
                     class_inds = range(len(self.shap_values))
